@@ -94,22 +94,34 @@ function createCursor(gsap) {
   const dotY = gsap.quickTo(dot, 'y', { duration: .055, ease: 'power3.out' });
   const auraX = gsap.quickTo(aura, 'x', { duration: .28, ease: 'power3.out' });
   const auraY = gsap.quickTo(aura, 'y', { duration: .28, ease: 'power3.out' });
-  gsap.set([dot, aura], { xPercent: -50, yPercent: -50 });
+  gsap.set([dot, aura], { xPercent: -50, yPercent: -50, opacity: 0 });
+  let pointerInitialized = false;
   let cursorVisible = false;
   const showCursor = () => {
     if (cursorVisible) return;
     cursorVisible = true;
-    gsap.to([dot, aura], { opacity: 1, duration: .18, overwrite: true });
+    gsap.to([dot, aura], { opacity: 1, duration: .18, overwrite: 'auto' });
   };
-  window.addEventListener('pointermove', ({ clientX, clientY }) => {
-    dotX(clientX); dotY(clientY); auraX(clientX); auraY(clientY);
+  const handlePointerMove = ({ clientX, clientY }) => {
+    if (!Number.isFinite(clientX) || !Number.isFinite(clientY)) return;
+    if (!pointerInitialized) {
+      gsap.set(dot, { x: clientX, y: clientY });
+      gsap.set(aura, { x: clientX, y: clientY });
+      pointerInitialized = true;
+    } else {
+      dotX(clientX); dotY(clientY); auraX(clientX); auraY(clientY);
+    }
     showCursor();
-  }, { passive: true });
-  document.addEventListener('mouseleave', () => {
+  };
+  const hideCursor = () => {
+    pointerInitialized = false;
     cursorVisible = false;
-    gsap.to([dot, aura], { opacity: 0, duration: .18, overwrite: true });
-  });
-  document.addEventListener('mouseenter', showCursor);
+    gsap.to([dot, aura], { opacity: 0, duration: .18, overwrite: 'auto' });
+  };
+  window.addEventListener('pointermove', handlePointerMove, { passive: true });
+  document.documentElement.addEventListener('pointerenter', handlePointerMove, { passive: true });
+  document.documentElement.addEventListener('pointerleave', hideCursor);
+  window.addEventListener('blur', hideCursor);
   document.querySelectorAll('a, button, .hero-name, .about-copy h2, .signal-copy, .trajectory-intro p, .pathway li, .skill-list div, .work-empty, .interest, .ai-callout, .contact-main h2').forEach((element) => {
     element.addEventListener('pointerenter', () => {
       dot.classList.add('is-active');
