@@ -119,7 +119,7 @@ body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--sans);o
 .footer-info div:last-child{text-align:right}
 .reveal{opacity:0;transform:translateY(22px);transition:opacity .85s cubic-bezier(.2,.8,.2,1),transform .85s cubic-bezier(.2,.8,.2,1)}
 .reveal.visible{opacity:1;transform:none}
-.cursor{position:fixed;width:9px;height:9px;background:var(--accent);border-radius:50%;top:0;left:0;z-index:50;pointer-events:none;transform:translate(-50%,-50%);mix-blend-mode:screen;opacity:0;transition:width .2s,height .2s,opacity .2s}
+.cursor{position:fixed;width:5px;height:5px;background:#fff;border-radius:50%;top:0;left:0;z-index:50;pointer-events:none;transform:translate(-50%,-50%);mix-blend-mode:difference;opacity:0;transition:width .2s,height .2s,opacity .2s}
 @media(pointer:fine){body:hover .cursor{opacity:1}
 }
 @media(max-width:700px){.nav{padding:0 16px;height:60px}
@@ -247,11 +247,11 @@ body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--sans);o
 }
 
 /* Dot + localized contrast-lens cursor */
-:root{--cursor-aura-size:140px}
-.cursor{width:6px;height:6px;background:var(--paper);border-radius:50%;z-index:52;mix-blend-mode:normal;opacity:0;box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 78%,transparent),0 0 10px color-mix(in srgb,var(--accent) 28%,transparent);will-change:transform,opacity;transition:opacity .2s,width .2s,height .2s,box-shadow var(--theme-duration) var(--theme-ease)}
-.cursor-aura{position:fixed;top:0;left:0;width:var(--cursor-aura-size);height:var(--cursor-aura-size);border-radius:50%;z-index:51;pointer-events:none;opacity:0;background:color-mix(in srgb,var(--accent) 2%,transparent);box-shadow:inset 0 0 32px color-mix(in srgb,var(--accent) 5%,transparent);backdrop-filter:invert(1);-webkit-backdrop-filter:invert(1);-webkit-mask-image:radial-gradient(circle at center,#000 38%,rgba(0,0,0,.82) 56%,rgba(0,0,0,.34) 78%,transparent 100%);mask-image:radial-gradient(circle at center,#000 38%,rgba(0,0,0,.82) 56%,rgba(0,0,0,.34) 78%,transparent 100%);will-change:transform,opacity,width,height;transition:opacity .2s,width .25s,height .25s,background-color var(--theme-duration) var(--theme-ease),box-shadow var(--theme-duration) var(--theme-ease),-webkit-mask-image .25s,mask-image .25s}
-.cursor.is-active{width:7px;height:7px}
-.cursor-aura.is-active{width:calc(var(--cursor-aura-size) * 1.08);height:calc(var(--cursor-aura-size) * 1.08);background:color-mix(in srgb,var(--accent) 3.5%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 14%,transparent),inset 0 0 38px color-mix(in srgb,var(--accent) 7%,transparent);-webkit-mask-image:radial-gradient(circle at center,#000 60%,rgba(0,0,0,.84) 72%,transparent 100%);mask-image:radial-gradient(circle at center,#000 60%,rgba(0,0,0,.84) 72%,transparent 100%)}
+:root{--cursor-aura-size:145px}
+.cursor{width:5px;height:5px;background:#fff;border-radius:50%;z-index:52;mix-blend-mode:difference;opacity:0;box-shadow:none;will-change:transform,opacity;transition:opacity .16s,width .2s,height .2s}
+.cursor-aura{position:fixed;top:0;left:0;width:var(--cursor-aura-size);height:var(--cursor-aura-size);border-radius:50%;z-index:51;pointer-events:none;opacity:0;background:rgba(255,255,255,.001);box-shadow:none;backdrop-filter:invert(1) contrast(1.06) saturate(.86);-webkit-backdrop-filter:invert(1) contrast(1.06) saturate(.86);-webkit-mask-image:radial-gradient(circle at center,#000 0 46%,rgba(0,0,0,.94) 57%,rgba(0,0,0,.68) 69%,rgba(0,0,0,.3) 83%,transparent 100%);mask-image:radial-gradient(circle at center,#000 0 46%,rgba(0,0,0,.94) 57%,rgba(0,0,0,.68) 69%,rgba(0,0,0,.3) 83%,transparent 100%);will-change:transform,opacity,width,height;transition:opacity .18s,width .25s,height .25s,-webkit-mask-image .25s,mask-image .25s}
+.cursor.is-active{width:6px;height:6px}
+.cursor-aura.is-active{width:calc(var(--cursor-aura-size) * 1.07);height:calc(var(--cursor-aura-size) * 1.07);-webkit-mask-image:radial-gradient(circle at center,#000 0 52%,rgba(0,0,0,.92) 63%,rgba(0,0,0,.56) 78%,transparent 100%);mask-image:radial-gradient(circle at center,#000 0 52%,rgba(0,0,0,.92) 63%,rgba(0,0,0,.56) 78%,transparent 100%)}
 @media(max-width:1000px) and (pointer:fine){:root{--cursor-aura-size:112px}}
 @media(pointer:coarse),(prefers-reduced-motion:reduce){.cursor,.cursor-aura{display:none!important}}
 @media(pointer:fine) and (min-width:1025px){html,body,body *{cursor:none!important}}

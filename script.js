@@ -90,17 +90,27 @@ function createCursor(gsap) {
   if (reducedMotion || !matchMedia('(pointer:fine)').matches) return;
   const dot = document.querySelector('.cursor');
   const aura = document.querySelector('.cursor-aura');
-  const dotX = gsap.quickTo(dot, 'x', { duration: .1, ease: 'power3.out' });
-  const dotY = gsap.quickTo(dot, 'y', { duration: .1, ease: 'power3.out' });
-  const auraX = gsap.quickTo(aura, 'x', { duration: .3, ease: 'power3.out' });
-  const auraY = gsap.quickTo(aura, 'y', { duration: .3, ease: 'power3.out' });
+  const dotX = gsap.quickTo(dot, 'x', { duration: .055, ease: 'power3.out' });
+  const dotY = gsap.quickTo(dot, 'y', { duration: .055, ease: 'power3.out' });
+  const auraX = gsap.quickTo(aura, 'x', { duration: .28, ease: 'power3.out' });
+  const auraY = gsap.quickTo(aura, 'y', { duration: .28, ease: 'power3.out' });
   gsap.set([dot, aura], { xPercent: -50, yPercent: -50 });
+  let cursorVisible = false;
+  const showCursor = () => {
+    if (cursorVisible) return;
+    cursorVisible = true;
+    gsap.to([dot, aura], { opacity: 1, duration: .18, overwrite: true });
+  };
   window.addEventListener('pointermove', ({ clientX, clientY }) => {
     dotX(clientX); dotY(clientY); auraX(clientX); auraY(clientY);
+    showCursor();
   }, { passive: true });
-  document.addEventListener('mouseleave', () => gsap.to([dot, aura], { opacity: 0, duration: .2 }));
-  document.addEventListener('mouseenter', () => gsap.to([dot, aura], { opacity: 1, duration: .2 }));
-  document.querySelectorAll('a, button, .interest, .skill-list div, .work-empty, .trajectory').forEach((element) => {
+  document.addEventListener('mouseleave', () => {
+    cursorVisible = false;
+    gsap.to([dot, aura], { opacity: 0, duration: .18, overwrite: true });
+  });
+  document.addEventListener('mouseenter', showCursor);
+  document.querySelectorAll('a, button, .hero-name, .about-copy h2, .signal-copy, .trajectory-intro p, .pathway li, .skill-list div, .work-empty, .interest, .ai-callout, .contact-main h2').forEach((element) => {
     element.addEventListener('pointerenter', () => {
       dot.classList.add('is-active');
       aura.classList.add('is-active');
