@@ -1,5 +1,48 @@
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const hasGsap = Boolean(window.gsap && window.ScrollTrigger);
+document.documentElement.dataset.motionRuntime = hasGsap ? 'gsap' : 'fallback';
+const themeRoot = document.documentElement;
+const themeStorageKey = 'ashwath-theme';
+const themeConfig = {
+  gold: { label: 'GOLD', accent: '#C9A838', rgb: { r: 201, g: 168, b: 56 } },
+  neon: { label: 'NEON', accent: '#2BED34', rgb: { r: 43, g: 237, b: 52 } }
+};
+
+function normalizeTheme(theme) {
+  return theme === 'neon' ? 'neon' : 'gold';
+}
+
+function applyTheme(theme, { persist = true, animate = true } = {}) {
+  const nextTheme = normalizeTheme(theme);
+  const previousTheme = normalizeTheme(themeRoot.dataset.theme);
+  const toggle = document.querySelector('.theme-toggle');
+  const label = toggle?.querySelector('.theme-toggle-label');
+  const glyph = toggle?.querySelector('.theme-toggle-glyph');
+  themeRoot.dataset.theme = nextTheme;
+  if (label) label.textContent = themeConfig[nextTheme].label;
+  if (toggle) {
+    const nextLabel = nextTheme === 'gold' ? 'neon' : 'gold';
+    toggle.setAttribute('aria-pressed', String(nextTheme === 'neon'));
+    toggle.setAttribute('aria-label', `${themeConfig[nextTheme].label[0] + themeConfig[nextTheme].label.slice(1).toLowerCase()} accent theme active. Switch to ${nextLabel} accent theme.`);
+    toggle.title = `Switch to ${nextLabel} accent theme`;
+  }
+  if (persist) {
+    try { localStorage.setItem(themeStorageKey, nextTheme); } catch (error) { /* Storage is optional. */ }
+  }
+  window.dispatchEvent(new CustomEvent('themechange', { detail: { theme: nextTheme, accent: themeConfig[nextTheme].accent, rgb: { ...themeConfig[nextTheme].rgb } } }));
+  if (animate && previousTheme !== nextTheme && hasGsap && !reducedMotion && glyph) {
+    window.gsap.fromTo(glyph, { rotation: -110, scale: .45 }, { rotation: 0, scale: 1, duration: .72, ease: 'elastic.out(1,.55)', overwrite: true });
+  }
+}
+
+function setupThemeToggle() {
+  const toggle = document.querySelector('.theme-toggle');
+  applyTheme(themeRoot.dataset.theme, { persist: false, animate: false });
+  toggle?.addEventListener('click', () => applyTheme(themeRoot.dataset.theme === 'neon' ? 'gold' : 'neon'));
+  window.addEventListener('storage', (event) => {
+    if (event.key === themeStorageKey) applyTheme(event.newValue, { persist: false });
+  });
+}
 
 function revealWithObserver() {
   const observer = new IntersectionObserver((entries) => {
@@ -11,6 +54,7 @@ function revealWithObserver() {
 function startCanvas() {
   const canvas = document.getElementById('signal-canvas');
   const ctx = canvas.getContext('2d');
+  const accentRgb = { ...themeConfig[normalizeTheme(themeRoot.dataset.theme)].rgb };
   let width, height, frame = 0;
   function resize() {
     const ratio = Math.min(devicePixelRatio, 2);
@@ -26,11 +70,19 @@ function startCanvas() {
       const wave = Math.sin(x * .015 + frame * .02) + Math.cos(y * .022 - frame * .016) + Math.sin((x + y) * .008);
       const dx = Math.cos(wave * 2.5) * 3; const dy = Math.sin(wave * 2.5) * 3;
       const bright = (wave + 3) / 6;
-      ctx.fillStyle = wave > 1.15 ? `rgba(201,168,56,${.18 + bright * .4})` : `rgba(255,255,255,${.025 + bright * .15})`;
+      ctx.fillStyle = wave > 1.15 ? `rgba(${Math.round(accentRgb.r)},${Math.round(accentRgb.g)},${Math.round(accentRgb.b)},${.18 + bright * .4})` : `rgba(255,255,255,${.025 + bright * .15})`;
       ctx.fillRect(x + dx, y + dy, 1.5, 1.5);
     }
     if (!reducedMotion) requestAnimationFrame(draw);
   }
+  window.addEventListener('themechange', ({ detail }) => {
+    const nextRgb = detail?.rgb || themeConfig[normalizeTheme(themeRoot.dataset.theme)].rgb;
+    if (!reducedMotion && window.gsap) window.gsap.to(accentRgb, { ...nextRgb, duration: .72, ease: 'power2.inOut', overwrite: true });
+    else {
+      Object.assign(accentRgb, nextRgb);
+      if (reducedMotion) draw();
+    }
+  });
   resize(); window.addEventListener('resize', resize, { passive: true }); draw();
 }
 
@@ -48,7 +100,7 @@ function createCursor(gsap) {
   }, { passive: true });
   document.addEventListener('mouseleave', () => gsap.to([dot, aura], { opacity: 0, duration: .2 }));
   document.addEventListener('mouseenter', () => gsap.to([dot, aura], { opacity: 1, duration: .2 }));
-  document.querySelectorAll('a, .interest, .skill-list div, .work-empty, .trajectory').forEach((element) => {
+  document.querySelectorAll('a, button, .interest, .skill-list div, .work-empty, .trajectory').forEach((element) => {
     element.addEventListener('pointerenter', () => {
       dot.classList.add('is-active');
       aura.classList.add('is-active');
@@ -122,6 +174,8 @@ function startExperience() {
   else if (hasGsap) startGsap();
   else revealWithObserver();
 }
+
+setupThemeToggle();
 
 if (document.fonts?.ready) document.fonts.ready.then(startExperience).catch(startExperience);
 else startExperience();

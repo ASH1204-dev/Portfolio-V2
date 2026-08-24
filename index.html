@@ -4,7 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Ashwath M.S. — CSE student, learning toward AI engineering." />
+    <meta name="theme-color" content="#141414" />
     <title>Ashwath M.S. — CSE / AI</title>
+    <script>
+      (() => {
+        const storageKey = 'ashwath-theme';
+        let theme = 'gold';
+        try {
+          const savedTheme = localStorage.getItem(storageKey);
+          if (savedTheme === 'gold' || savedTheme === 'neon') theme = savedTheme;
+        } catch (error) {
+          // Storage can be unavailable in privacy-focused browsing modes.
+        }
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -21,11 +35,14 @@
         <a href="#work">WORKS<span>//</span></a>
         <a href="#contact">LET'S TALK<span>↗</span></a>
       </nav>
-      <span class="nav-index">(01)</span>
+      <button class="nav-index theme-toggle magnetic" type="button" aria-pressed="false" aria-label="Gold accent theme active. Switch to neon accent theme.">
+        <span class="theme-toggle-glyph" aria-hidden="true">◐</span>
+        <span class="theme-toggle-label">GOLD</span>
+      </button>
     </header>
 
     <main id="top">
-      <section class="hero section-grid" data-cursor="EXPLORE">
+      <section class="hero section-grid">
         <div class="hero-side meta">
           <span>(01)</span><span>COMPUTER SCIENCE</span><span>MANIPAL / BENGALURU</span>
         </div>
@@ -39,7 +56,7 @@
           </div>
           <div class="hero-direction meta"><span>PYTHON / MACHINE LEARNING</span><span>CURRENTLY LEARNING AI <i>→</i></span></div>
         </div>
-        <a class="scroll-cue meta magnetic" href="#about" data-cursor="↓"><span>SCROLL TO EXPLORE</span><i>↓</i></a>
+        <a class="scroll-cue meta magnetic" href="#about"><span>SCROLL TO EXPLORE</span><i>↓</i></a>
         <span class="hero-baseline" aria-hidden="true"></span>
       </section>
 
@@ -94,7 +111,7 @@
 
       <section id="work" class="work">
         <div class="work-top section-grid"><div class="section-label meta reveal"><span>(06)</span><span>SELECTED WORK //</span></div><span class="meta reveal">INDEX / EMPTY BY DESIGN</span></div>
-        <div class="work-empty reveal" data-cursor="VIEW"><span class="meta">NO COMPLETED PROJECTS / YET</span><h2>CURRENTLY<br /><i>BUILDING.</i></h2><p>Projects will appear here as I build, learn, and experiment. Each one will be treated as a proper study — not just a thumbnail.</p><div class="work-line"><span>PROJECT 01</span><span>IN DEVELOPMENT</span><span>—</span></div></div>
+        <div class="work-empty reveal"><span class="meta">NO COMPLETED PROJECTS / YET</span><h2>CURRENTLY<br /><i>BUILDING.</i></h2><p>Projects will appear here as I build, learn, and experiment. Each one will be treated as a proper study — not just a thumbnail.</p><div class="work-line"><span>PROJECT 01</span><span>IN DEVELOPMENT</span><span>—</span></div></div>
       </section>
 
       <div class="ticker light-ticker" aria-hidden="true"><div class="ticker-track"><span>STAY HUMAN™ — KEEP LEARNING — STAY HUMAN™ — KEEP LEARNING — </span><span>STAY HUMAN™ — KEEP LEARNING — STAY HUMAN™ — KEEP LEARNING — </span></div></div>
@@ -124,8 +141,8 @@
       <div class="footer-band"><div class="ticker-track"><span>LET'S CONNECT © LET'S CONNECT © LET'S CONNECT © </span><span>LET'S CONNECT © LET'S CONNECT © LET'S CONNECT © </span></div></div>
       <div class="footer-info"><div>ASHWATH M.S.<br />BENGALURU / INDIA</div><div>CSE / MANIPAL<br />AVAILABLE FOR COLLABORATION</div><div>© 2026 ASHWATH M.S.<br />MADE WITH CURIOSITY</div></div>
     </footer>
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+    <script src="assets/vendor/gsap.min.js"></script>
+    <script src="assets/vendor/ScrollTrigger.min.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
