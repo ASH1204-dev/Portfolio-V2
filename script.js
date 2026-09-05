@@ -1,3 +1,8 @@
+const CONTACT = Object.freeze({
+  email: 'msashwath3009@gmail.com',
+  linkedin: 'https://www.linkedin.com/feed/'
+});
+
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const hasGsap = Boolean(window.gsap && window.ScrollTrigger);
 document.documentElement.dataset.motionRuntime = hasGsap ? 'gsap' : 'fallback';
@@ -7,6 +12,18 @@ const themeConfig = {
   gold: { label: 'GOLD', accent: '#C9A838', rgb: { r: 201, g: 168, b: 56 } },
   neon: { label: 'NEON', accent: '#2BED34', rgb: { r: 43, g: 237, b: 52 } }
 };
+
+function applyContactLinks() {
+  document.querySelectorAll('[data-contact="email"]').forEach((link) => {
+    link.href = `mailto:${CONTACT.email}`;
+  });
+
+  document.querySelectorAll('[data-contact="linkedin"]').forEach((link) => {
+    link.href = CONTACT.linkedin;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+  });
+}
 
 function normalizeTheme(theme) {
   return theme === 'neon' ? 'neon' : 'gold';
@@ -197,6 +214,7 @@ function startExperience() {
   else revealWithObserver();
 }
 
+applyContactLinks();
 setupThemeToggle();
 
 if (document.fonts?.ready) document.fonts.ready.then(startExperience).catch(startExperience);
