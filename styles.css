@@ -6,14 +6,24 @@ html[data-theme='neon']{--accent:#2BED34;--accent-rgb:43 237 52}
 html{scroll-behavior:smooth;background:var(--ink);color-scheme:dark;transition:--accent var(--theme-duration) var(--theme-ease)}
 body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--sans);overflow-x:hidden}
 .noise{position:fixed;inset:0;opacity:.045;pointer-events:none;z-index:20;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E")}
-.nav-transition{position:fixed;inset:0 0 auto;height:2px;z-index:60;overflow:hidden;pointer-events:none}
-.nav-transition-line{display:block;width:100%;height:100%;background:var(--accent);opacity:0;transform:scaleX(0);transform-origin:left center;will-change:transform,opacity}
+.route-transition{position:fixed;inset:0;z-index:70;overflow:hidden;pointer-events:none;visibility:hidden;isolation:isolate}
+.route-transition.is-active{pointer-events:auto}
+.route-transition-mask{position:absolute;inset:-1px;background:var(--ink);will-change:clip-path}
+.route-transition-stage{position:absolute;inset:0;color:var(--paper)}
+.route-transition-index{position:absolute;top:clamp(24px,3.2vw,52px);left:2.2vw;color:var(--muted);font:10px var(--mono);letter-spacing:.04em;opacity:0;will-change:transform,opacity}
+.route-transition-title{position:absolute;inset:0 2.2vw;display:flex;align-items:center;overflow:hidden;font-family:var(--display);font-size:clamp(5rem,14vw,15.5rem);font-weight:600;line-height:.76;letter-spacing:-.075em;white-space:nowrap;will-change:transform,opacity,clip-path}
+.route-transition-title-inner{display:inline-block;opacity:0;will-change:transform,opacity,letter-spacing}
+.route-transition-symbol{position:absolute;top:clamp(23px,3.2vw,50px);right:2.2vw;color:var(--accent);font:500 clamp(1.3rem,2.1vw,2.8rem) var(--display);opacity:0;will-change:transform,opacity}
+.route-transition-line{position:absolute;left:2.2vw;right:2.2vw;bottom:14vh;height:1px;background:var(--accent);opacity:0;transform:scaleX(.04);transform-origin:left center;will-change:transform,opacity}
+.route-transition[data-variant='work'] .route-transition-line{top:50%;bottom:auto}
+html.is-route-transitioning{scroll-behavior:auto}
 .nav{height:72px;position:absolute;top:0;width:100%;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:0 2.2vw;font:11px var(--mono);letter-spacing:.03em}
 .wordmark{color:var(--paper);text-decoration:none;font:600 19px var(--sans);letter-spacing:-.08em}
 .wordmark span{font:9px var(--mono);vertical-align:top;margin-left:2px}
 .nav nav{display:flex;gap:28px}
 .nav a{color:var(--paper);text-decoration:none}
 .nav nav a{position:relative;padding:4px 0}
+.nav nav a[aria-current='location']{color:var(--accent)}
 .nav nav a:focus-visible{outline:1px solid var(--accent);outline-offset:5px}
 .nav-label,.nav-symbol{display:inline-block;will-change:transform,opacity}
 .nav-symbol{color:var(--accent);margin-left:3px}
@@ -235,6 +245,10 @@ body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--sans);o
   .cursor{display:none!important}
 }
 html[data-micro-motion='fallback'] .section-entry-line{transform:none;opacity:.38}
+html[data-micro-motion='fallback'] .route-transition-index,
+html[data-micro-motion='fallback'] .route-transition-title-inner,
+html[data-micro-motion='fallback'] .route-transition-symbol{opacity:1}
+html[data-micro-motion='fallback'] .route-transition-line{opacity:1;transform:scaleX(1)}
 
 /* Ranade display typography, compact editorial About, and adaptive cursor */
 @font-face{font-family:'Ranade';src:url('assets/fonts/Ranade-Variable.woff2') format('woff2');font-weight:100 700;font-style:normal;font-display:swap}
@@ -315,3 +329,10 @@ html[data-micro-motion='fallback'] .section-entry-line{transform:none;opacity:.3
   .wordmark{font-size:16px}
 }
 @media(max-width:1024px){.cursor,.cursor-aura{display:none!important}}
+@media(max-width:700px){
+  .route-transition-index{top:24px;left:16px}
+  .route-transition-symbol{top:21px;right:16px;font-size:1.4rem}
+  .route-transition-title{left:16px;right:16px;font-size:clamp(3.2rem,17.5vw,7rem);line-height:.8;letter-spacing:-.06em}
+  .route-transition-line{left:16px;right:16px;bottom:11vh}
+}
+@media(prefers-reduced-motion:reduce){.route-transition{display:none!important}}

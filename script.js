@@ -180,22 +180,139 @@ function revealText(gsap, element) {
 }
 
 function createNavigationTransitions(gsap) {
-  const line = document.querySelector('.nav-transition-line');
-  if (!line || reducedMotion) return;
+  const overlay = document.querySelector('.route-transition');
+  const mask = overlay?.querySelector('.route-transition-mask');
+  const stage = overlay?.querySelector('.route-transition-stage');
+  const title = overlay?.querySelector('.route-transition-title');
+  const titleInner = overlay?.querySelector('.route-transition-title-inner');
+  const routeIndex = overlay?.querySelector('.route-transition-index');
+  const routeSymbol = overlay?.querySelector('.route-transition-symbol');
+  if (!overlay || !mask || !stage || !title || !titleInner || !routeIndex || !routeSymbol || reducedMotion) return;
+
+  const routes = {
+    '#top': {
+      index: '(01)', title: 'HOME', symbol: '↙', variant: 'home',
+      maskIn: 'inset(50% 50% 50% 50%)', maskCover: 'inset(0 0 0 0)', maskOut: 'inset(50% 50% 50% 50%)',
+      titleFrom: { scale: 1.16, yPercent: 0 }, titleOut: { scale: .9, yPercent: 0 },
+      arrivalClip: 'inset(6% 8% 6% 8%)'
+    },
+    '#about': {
+      index: '(02)', title: 'ABOUT', symbol: '*', variant: 'about',
+      maskIn: 'inset(0 100% 0 0)', maskCover: 'inset(0 0 0 0)', maskOut: 'inset(0 0 0 100%)',
+      titleFrom: { scale: .94, xPercent: -12 }, titleOut: { scale: 1.03, xPercent: 10 },
+      arrivalClip: 'inset(0 0 8% 0)'
+    },
+    '#work': {
+      index: '(06)', title: 'WORKS', symbol: '//', variant: 'work',
+      maskIn: 'inset(49.8% 0 49.8% 0)', maskCover: 'inset(0 0 0 0)', maskOut: 'inset(0 0 100% 0)',
+      titleFrom: { scale: 1, yPercent: 18 }, titleOut: { scale: 1, xPercent: 9 },
+      arrivalClip: 'inset(0 0 12% 0)'
+    },
+    '#contact': {
+      index: '(09)', title: "LET'S TALK", symbol: '↗', variant: 'contact',
+      maskIn: 'circle(0% at 82% 50%)', maskCover: 'circle(150% at 82% 50%)', maskOut: 'circle(0% at 18% 50%)',
+      titleFrom: { scale: .96, xPercent: 13 }, titleOut: { scale: 1.05, xPercent: -10 },
+      arrivalClip: 'circle(36% at 72% 50%)'
+    }
+  };
+  const compact = window.matchMedia('(max-width: 700px)').matches;
+  let transitioning = false;
+
+  function currentScene() {
+    const viewportCenter = window.innerHeight / 2;
+    return Array.from(document.querySelectorAll('main > section')).reduce((nearest, section) => {
+      const bounds = section.getBoundingClientRect();
+      const distance = Math.abs(bounds.top + Math.min(bounds.height, window.innerHeight) / 2 - viewportCenter);
+      return !nearest || distance < nearest.distance ? { section, distance } : nearest;
+    }, null)?.section;
+  }
+
+  function updateCurrentLink(hash) {
+    document.querySelectorAll('.nav nav a').forEach((link) => {
+      if (link.getAttribute('href') === hash) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
+    });
+  }
 
   document.querySelectorAll('.nav nav a, .wordmark, .scroll-cue').forEach((link) => {
     link.addEventListener('click', (event) => {
+      if (transitioning) {
+        event.preventDefault();
+        return;
+      }
       if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-      const target = document.querySelector(link.getAttribute('href'));
-      if (!target) return;
 
-      gsap.killTweensOf(line);
-      gsap.timeline()
-        .set(line, { scaleX: 0, opacity: 0, transformOrigin: 'left center' })
-        .to(line, { scaleX: 1, opacity: 1, duration: .24, ease: 'power4.in' })
-        .to(line, { scaleX: 0, opacity: 0, transformOrigin: 'right center', duration: .42, ease: 'power4.out' });
+      const hash = link.getAttribute('href');
+      const route = routes[hash];
+      const target = route ? document.querySelector(hash) : null;
+      if (!route || !target) return;
+
+      const destinationY = hash === '#top' ? 0 : target.getBoundingClientRect().top + window.scrollY;
+      if (Math.abs(window.scrollY - destinationY) < 3) {
+        event.preventDefault();
+        return;
+      }
+
+      event.preventDefault();
+      transitioning = true;
+      themeRoot.classList.add('is-route-transitioning');
+      overlay.classList.add('is-active');
+      overlay.dataset.variant = route.variant;
+
+      const source = currentScene();
+      const arrival = hash === '#top' ? document.querySelector('.hero') : target;
+      const microMotion = window.PortfolioMicroMotion;
+      const sourceExit = { opacity: .72, duration: compact ? .2 : .26, ease: 'power2.in' };
+      if (source && !source.classList.contains('trajectory')) sourceExit.scale = route.variant === 'home' ? .975 : .99;
+
+      routeIndex.textContent = route.index;
+      titleInner.textContent = route.title;
+      routeSymbol.textContent = route.symbol;
+      microMotion?.prepareRouteTransition(route);
+      gsap.killTweensOf([overlay, mask, stage, title, source, arrival]);
+
+      const timeline = gsap.timeline({
+        defaults: { ease: 'power4.inOut' },
+        onComplete: () => {
+          gsap.set([source, arrival], { clearProps: 'transform,opacity,clip-path' });
+          gsap.set([overlay, mask, stage, title], { clearProps: 'visibility,opacity,clip-path,transform' });
+          overlay.classList.remove('is-active');
+          themeRoot.classList.remove('is-route-transitioning');
+          microMotion?.resetRouteTransition();
+          window.ScrollTrigger?.update();
+          transitioning = false;
+        }
+      });
+
+      timeline
+        .set(overlay, { autoAlpha: 1 })
+        .set(mask, { clipPath: route.maskIn })
+        .set(stage, { clipPath: route.maskIn })
+        .fromTo(title,
+          { ...route.titleFrom, autoAlpha: 0, clipPath: 'inset(0 0 100% 0)' },
+          { xPercent: 0, yPercent: 0, scale: 1, autoAlpha: 1, clipPath: 'inset(0 0 0% 0)', duration: compact ? .2 : .23 },
+          .03)
+        .to(source, sourceExit, 0)
+        .to(mask, { clipPath: route.maskCover, duration: compact ? .3 : .34 }, 0)
+        .to(stage, { clipPath: route.maskCover, duration: compact ? .3 : .34 }, 0)
+        .call(() => microMotion?.playRouteTransition(route), null, .04)
+        .call(() => {
+          window.scrollTo({ top: destinationY, left: 0, behavior: 'auto' });
+          if (window.location.hash !== hash) history.pushState(null, '', hash);
+          updateCurrentLink(hash);
+          window.ScrollTrigger?.update();
+          window.dispatchEvent(new CustomEvent('portfolio:route-enter', { detail: { hash, variant: route.variant } }));
+        }, null, compact ? .31 : .37)
+        .set(arrival, { y: compact ? 10 : 18, opacity: .76, clipPath: route.arrivalClip }, compact ? .31 : .37)
+        .to(source, { scale: 1, opacity: 1, duration: .34, ease: 'power3.out' }, compact ? .32 : .39)
+        .to(arrival, { y: 0, opacity: 1, clipPath: route.variant === 'contact' ? 'circle(150% at 72% 50%)' : 'inset(0 0 0 0)', duration: compact ? .34 : .41, ease: 'power4.out' }, compact ? .34 : .41)
+        .to(title, { ...route.titleOut, autoAlpha: 0, clipPath: 'inset(100% 0 0 0)', duration: .2, ease: 'power3.in' }, compact ? .39 : .45)
+        .call(() => microMotion?.finishRouteTransition(route), null, compact ? .38 : .44)
+        .to(mask, { clipPath: route.maskOut, duration: compact ? .33 : .39 }, compact ? .4 : .46)
+        .to(stage, { clipPath: route.maskOut, duration: compact ? .33 : .39 }, compact ? .4 : .46);
     });
   });
+  updateCurrentLink(window.location.hash);
 }
 
 function startGsap() {

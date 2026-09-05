@@ -2,10 +2,92 @@
   const root = document.documentElement;
   let scope = null;
   let pageHideHandler = null;
+  const routeAnimations = new Set();
 
   function getAnime() {
     const api = window.anime;
     return api?.animate && api?.createScope && api?.stagger && api?.utils ? api : null;
+  }
+
+  function stopRouteAnimations() {
+    routeAnimations.forEach((animation) => animation.cancel());
+    routeAnimations.clear();
+  }
+
+  function trackRouteAnimation(animation) {
+    if (animation) routeAnimations.add(animation);
+    return animation;
+  }
+
+  function getRouteDetails() {
+    return {
+      index: document.querySelector('.route-transition-index'),
+      title: document.querySelector('.route-transition-title-inner'),
+      symbol: document.querySelector('.route-transition-symbol'),
+      line: document.querySelector('.route-transition-line')
+    };
+  }
+
+  function prepareRouteTransition({ index = '', title = '', symbol = '', variant = 'about' } = {}) {
+    const api = getAnime();
+    const details = getRouteDetails();
+    if (!api || !details.title) return;
+
+    stopRouteAnimations();
+    details.index.textContent = index;
+    details.title.textContent = title;
+    details.symbol.textContent = symbol;
+
+    const titleOffset = variant === 'contact' ? 18 : variant === 'home' ? 0 : -14;
+    api.utils.set(details.index, { x: 9, opacity: 0 });
+    api.utils.set(details.title, { x: titleOffset, opacity: 0 });
+    api.utils.set(details.symbol, { y: 8, rotate: variant === 'about' ? -14 : 0, opacity: 0 });
+    api.utils.set(details.line, { scaleX: .04, opacity: 0, transformOrigin: 'left center' });
+  }
+
+  function playRouteTransition({ variant = 'about' } = {}) {
+    const api = getAnime();
+    const details = getRouteDetails();
+    if (!api || !details.title || root.dataset.microMotion === 'reduced') return;
+
+    trackRouteAnimation(api.animate(details.index, { x: 0, opacity: 1, duration: 220, ease: 'out(4)' }));
+    trackRouteAnimation(api.animate(details.title, { x: 0, opacity: 1, duration: 250, ease: 'out(5)' }));
+    trackRouteAnimation(api.animate(details.symbol, {
+      y: 0,
+      rotate: variant === 'about' ? 0 : variant === 'contact' ? 5 : 0,
+      opacity: 1,
+      duration: 240,
+      delay: 25,
+      ease: 'out(4)'
+    }));
+    trackRouteAnimation(api.animate(details.line, {
+      scaleX: 1,
+      opacity: 1,
+      duration: variant === 'work' ? 320 : 280,
+      delay: variant === 'work' ? 0 : 35,
+      ease: 'inOut(4)'
+    }));
+  }
+
+  function finishRouteTransition({ variant = 'about' } = {}) {
+    const api = getAnime();
+    const details = getRouteDetails();
+    if (!api || !details.title || root.dataset.microMotion === 'reduced') return;
+
+    stopRouteAnimations();
+    trackRouteAnimation(api.animate(details.index, { x: -7, opacity: 0, duration: 190, ease: 'in(3)' }));
+    trackRouteAnimation(api.animate(details.title, { x: variant === 'contact' ? -12 : 12, opacity: 0, duration: 230, ease: 'in(3)' }));
+    trackRouteAnimation(api.animate(details.symbol, { y: -7, opacity: 0, duration: 180, ease: 'in(3)' }));
+    api.utils.set(details.line, { transformOrigin: 'right center' });
+    trackRouteAnimation(api.animate(details.line, { scaleX: 0, opacity: 0, duration: 250, ease: 'in(4)' }));
+  }
+
+  function resetRouteTransition() {
+    stopRouteAnimations();
+    Object.values(getRouteDetails()).forEach((element) => {
+      if (!element) return;
+      ['transform', 'opacity', 'transform-origin'].forEach((property) => element.style.removeProperty(property));
+    });
   }
 
   function init({ ScrollTrigger } = {}) {
@@ -353,6 +435,7 @@
   }
 
   function destroy() {
+    resetRouteTransition();
     if (!scope) return;
     scope.revert();
     scope = null;
@@ -363,6 +446,10 @@
 
   window.PortfolioMicroMotion = Object.freeze({
     init,
-    destroy
+    destroy,
+    prepareRouteTransition,
+    playRouteTransition,
+    finishRouteTransition,
+    resetRouteTransition
   });
 })();
