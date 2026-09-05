@@ -10,10 +10,11 @@ body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--sans);o
 .wordmark span{font:9px var(--mono);vertical-align:top;margin-left:2px}
 .nav nav{display:flex;gap:28px}
 .nav a{color:var(--paper);text-decoration:none}
-.nav nav a{border-bottom:1px solid transparent;padding:4px 0;transition:border-color .3s}
-.nav nav a:hover{border-color:var(--accent)}
+.nav nav a{position:relative;padding:4px 0}
 .nav nav a:focus-visible{outline:1px solid var(--accent);outline-offset:5px}
-.nav nav span{color:var(--accent);margin-left:3px}
+.nav-label,.nav-symbol{display:inline-block;will-change:transform,opacity}
+.nav-symbol{color:var(--accent);margin-left:3px}
+.nav-micro-line{position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--accent);opacity:0;transform:scaleX(.18);transform-origin:left center;will-change:transform,opacity}
 .nav-index{color:var(--muted)}
 .theme-toggle{appearance:none;display:inline-flex;align-items:center;justify-content:flex-end;gap:6px;min-width:52px;padding:4px 0;border:0;background:transparent;color:var(--muted);font:inherit;letter-spacing:inherit;text-align:left}
 .theme-toggle-glyph{color:var(--accent);display:inline-block;transform-origin:center}
@@ -30,6 +31,7 @@ body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--sans);o
 .hero-statement p{font-size:clamp(17px,1.35vw,23px);line-height:1.25;margin:14px 0 0;letter-spacing:-.04em}
 .hero-statement em{font-style:normal;color:var(--accent)}
 .hero-name{margin:0;line-height:.71;font-size:clamp(5.6rem,14.1vw,15rem);letter-spacing:-.1em;grid-column:1/13;position:relative;z-index:1;white-space:nowrap}
+.hero-name-inner{display:inline-block;will-change:transform,letter-spacing}
 .split-line{display:block}
 .outline{color:transparent;-webkit-text-stroke:1px var(--paper);margin-left:23vw}
 .scroll-cue{position:absolute;bottom:4.4vh;left:2.2vw;color:var(--muted);display:flex;gap:20px;align-items:center;text-decoration:none}
@@ -89,14 +91,18 @@ body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--sans);o
 .work-empty h2{font-size:clamp(4.5rem,12vw,15rem);line-height:.84;letter-spacing:-.055em;margin:2vw 0 7vw;max-width:100%}
 .work-empty h2 i{font-style:normal;color:var(--paper);-webkit-text-stroke:1px var(--ink)}
 .work-empty p{font-size:clamp(16px,1.55vw,23px);line-height:1.2;letter-spacing:-.04em;max-width:360px;margin-left:45%}
-.work-line{display:grid;grid-template-columns:1fr 1fr auto;border-top:1px solid var(--accent-line);margin-top:10vw;padding:11px 0;font:10px var(--mono)}
+.work-line{position:relative;display:grid;grid-template-columns:1fr 1fr auto;border-top:1px solid var(--accent-line);margin-top:10vw;padding:11px 0;font:10px var(--mono)}
+.work-line>span:not(.work-micro-line){display:inline-block;will-change:transform,opacity}
+.work-micro-line{position:absolute;top:-1px;left:0;right:0;height:1px;background:var(--paper);opacity:0;transform:scaleX(.16);transform-origin:left center;will-change:transform,opacity}
 .outside{padding-top:17vw;padding-bottom:16vw}
 .interest-list{grid-column:3/13}
-.interest{display:grid;grid-template-columns:10% 1fr;align-items:center;border-top:1px solid var(--line);padding:1vw 0;cursor:default}
+.interest{position:relative;display:grid;grid-template-columns:10% 1fr;align-items:center;border-top:1px solid var(--line);padding:1vw 0;cursor:default}
 .interest:last-child{border-bottom:1px solid var(--line)}
 .interest span{font:10px var(--mono);color:var(--muted)}
-.interest h2{font-size:clamp(3rem,7.5vw,10rem);letter-spacing:-.05em;line-height:.94;margin:0;transition:color .35s,transform .5s}
-.interest:hover h2{color:var(--accent);transform:translateX(15px)}
+.interest h2{font-size:clamp(3rem,7.5vw,10rem);letter-spacing:-.05em;line-height:.94;margin:0;transition:color .3s;will-change:transform,letter-spacing}
+.interest:hover h2{color:var(--accent)}
+.interest-micro-line{position:absolute;left:10%;right:0;bottom:-1px;height:1px;background:var(--accent);opacity:0;transform:scaleX(.16);transform-origin:left center;will-change:transform,opacity}
+.interest-marker{position:absolute;left:calc(10% - 12px);bottom:-2px;width:4px;height:4px;background:var(--accent);opacity:0;transform:scale(.5);will-change:transform,opacity}
 .ai-callout{background:var(--accent);color:var(--ink);min-height:90vh;padding:2vw;display:flex;flex-direction:column;justify-content:space-between}
 .ai-callout>p{font-size:clamp(3.2rem,8vw,11rem);font-weight:600;letter-spacing:-.05em;line-height:.94;margin:0}
 .ai-callout>p .callout-line{display:block;white-space:nowrap}
@@ -109,9 +115,11 @@ body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--sans);o
 .contact-main h2 i{font-style:normal;color:var(--muted)}
 .contact-links{grid-column:9/12;margin-top:9vw;display:flex;flex-direction:column;align-items:flex-start;gap:12px}
 .contact-links .meta{color:var(--muted);margin-bottom:14px}
-.contact-links a{color:var(--paper);font-size:clamp(1.5rem,2.5vw,3rem);letter-spacing:-.08em;text-decoration:none;border-bottom:1px solid var(--line);width:100%;min-height:44px;padding-bottom:7px;display:flex;align-items:center;justify-content:space-between;transition:color .3s}
+.contact-links a{color:var(--paper);font-size:clamp(1.5rem,2.5vw,3rem);letter-spacing:-.08em;text-decoration:none;border-bottom:1px solid var(--line);width:100%;min-height:44px;padding-bottom:7px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;transition:color .3s}
 .contact-links a:hover{color:var(--accent)}
 .contact-links a:focus-visible{color:var(--accent);outline:1px solid var(--accent);outline-offset:5px}
+.contact-label,.contact-links i{display:inline-block;will-change:transform,opacity}
+.contact-micro-line{height:1px;background:var(--accent);opacity:.22;transform:scaleX(.22);transform-origin:left center;will-change:transform,opacity}
 .contact-links i{font-style:normal;color:var(--accent)}
 .contact-links small{font:10px var(--mono);color:var(--muted);margin-top:12px}
 .footer-band{background:var(--accent);color:var(--ink);overflow:hidden;white-space:nowrap;padding:.5vw 0}

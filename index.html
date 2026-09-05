@@ -31,9 +31,9 @@
     <header class="nav">
       <a class="wordmark" href="#top" aria-label="Ashwath M.S. home">A.MS<span>®</span></a>
       <nav aria-label="Primary navigation">
-        <a href="#about">ABOUT<span>*</span></a>
-        <a href="#work">WORKS<span>//</span></a>
-        <a href="#contact">LET'S TALK<span>↗</span></a>
+        <a href="#about" aria-label="About"><span class="nav-label">ABOUT</span><span class="nav-symbol" aria-hidden="true">*</span><span class="nav-micro-line" aria-hidden="true"></span></a>
+        <a href="#work" aria-label="Works"><span class="nav-label">WORKS</span><span class="nav-symbol" aria-hidden="true">//</span><span class="nav-micro-line" aria-hidden="true"></span></a>
+        <a href="#contact" aria-label="Let's talk"><span class="nav-label">LET'S TALK</span><span class="nav-symbol" aria-hidden="true">↗</span><span class="nav-micro-line" aria-hidden="true"></span></a>
       </nav>
       <button class="nav-index theme-toggle magnetic" type="button" aria-pressed="false" aria-label="Gold accent theme active. Switch to neon accent theme.">
         <span class="theme-toggle-glyph" aria-hidden="true">◐</span>
@@ -48,7 +48,7 @@
         </div>
         <div class="hero-edition meta"><span>/2026/</span><span>BENGALURU / INDIA</span></div>
         <div class="hero-content">
-          <h1 class="hero-name" aria-label="Ashwath M.S.">ASHWATH M.S.</h1>
+          <h1 class="hero-name" aria-label="Ashwath M.S."><span class="hero-name-inner" aria-hidden="true">ASHWATH M.S.</span></h1>
           <div class="hero-rule" aria-hidden="true"></div>
           <div class="hero-statement">
             <span class="eyebrow">CURRENTLY LEARNING / BUILDING</span>
@@ -110,7 +110,7 @@
 
       <section id="work" class="work">
         <div class="work-top section-grid"><div class="section-label meta reveal"><span>(06)</span><span>SELECTED WORK //</span></div><span class="meta reveal">INDEX / EMPTY BY DESIGN</span></div>
-        <div class="work-empty reveal"><span class="meta">NO COMPLETED PROJECTS / YET</span><h2>CURRENTLY<br /><i>BUILDING.</i></h2><p>Projects will appear here as I build, learn, and experiment. Each one will be treated as a proper study — not just a thumbnail.</p><div class="work-line"><span>PROJECT 01</span><span>IN DEVELOPMENT</span><span>—</span></div></div>
+        <div class="work-empty reveal"><span class="meta">NO COMPLETED PROJECTS / YET</span><h2>CURRENTLY<br /><i>BUILDING.</i></h2><p>Projects will appear here as I build, learn, and experiment. Each one will be treated as a proper study — not just a thumbnail.</p><div class="work-line"><span>PROJECT 01</span><span>IN DEVELOPMENT</span><span>—</span><span class="work-micro-line" aria-hidden="true"></span></div></div>
       </section>
 
       <div class="ticker light-ticker" aria-hidden="true"><div class="ticker-track"><span>STAY HUMAN™ — KEEP LEARNING — STAY HUMAN™ — KEEP LEARNING — </span><span>STAY HUMAN™ — KEEP LEARNING — STAY HUMAN™ — KEEP LEARNING — </span></div></div>
@@ -118,9 +118,9 @@
       <section class="outside section-grid">
         <div class="section-label meta reveal"><span>(07)</span><span>OUTSIDE THE TERMINAL*</span></div>
         <div class="interest-list">
-          <div class="interest reveal"><span>01</span><h2>BADMINTON</h2></div>
-          <div class="interest reveal"><span>02</span><h2>CRICKET</h2></div>
-          <div class="interest reveal"><span>03</span><h2>ANIME</h2></div>
+          <div class="interest reveal"><span>01</span><h2>BADMINTON</h2><span class="interest-micro-line" aria-hidden="true"></span><span class="interest-marker" aria-hidden="true"></span></div>
+          <div class="interest reveal"><span>02</span><h2>CRICKET</h2><span class="interest-micro-line" aria-hidden="true"></span><span class="interest-marker" aria-hidden="true"></span></div>
+          <div class="interest reveal"><span>03</span><h2>ANIME</h2><span class="interest-micro-line" aria-hidden="true"></span><span class="interest-marker" aria-hidden="true"></span></div>
         </div>
       </section>
 
@@ -133,13 +133,15 @@
       <section id="contact" class="contact section-grid">
         <div class="section-label meta reveal"><span>(09)</span><span>CONNECTION //</span></div>
         <div class="contact-main reveal"><p>HAVE AN IDEA?</p><h2>LET'S MAKE<br />SOMETHING <i>INTERESTING.</i></h2></div>
-        <div class="contact-links reveal"><span class="meta">START A CONVERSATION</span><a href="#contact" data-contact="email" aria-label="Email Ashwath M.S.">EMAIL <i>↗</i></a><a href="#contact" data-contact="linkedin" target="_blank" rel="noopener noreferrer" aria-label="Open Ashwath M.S. on LinkedIn">LINKEDIN <i>↗</i></a></div>
+        <div class="contact-links reveal"><span class="meta">START A CONVERSATION</span><a href="#contact" data-contact="email" aria-label="Email Ashwath M.S."><span class="contact-label">EMAIL</span><span class="contact-micro-line" aria-hidden="true"></span><i aria-hidden="true">↗</i></a><a href="#contact" data-contact="linkedin" target="_blank" rel="noopener noreferrer" aria-label="Open Ashwath M.S. on LinkedIn"><span class="contact-label">LINKEDIN</span><span class="contact-micro-line" aria-hidden="true"></span><i aria-hidden="true">↗</i></a></div>
       </section>
     </main>
     <footer>
       <div class="footer-band"><div class="ticker-track"><span>LET'S CONNECT © LET'S CONNECT © LET'S CONNECT © </span><span>LET'S CONNECT © LET'S CONNECT © LET'S CONNECT © </span></div></div>
       <div class="footer-info"><div>ASHWATH M.S.<br />BENGALURU / INDIA</div><div>CSE / MANIPAL<br />AVAILABLE FOR COLLABORATION</div><div>© 2026 ASHWATH M.S.<br />MADE WITH CURIOSITY</div></div>
     </footer>
+    <script src="https://cdn.jsdelivr.net/npm/animejs@4.5.0/dist/bundles/anime.umd.min.js" integrity="sha384-InMmvD3VoYcY7hGjSC80aLb2bNNE4CzpX+Eq6FVDlmB0IKgDvmfPw4UY8L/M++iG" crossorigin="anonymous"></script>
+    <script src="anime-motion.js"></script>
     <script src="assets/vendor/gsap.min.js"></script>
     <script src="assets/vendor/ScrollTrigger.min.js"></script>
     <script src="script.js"></script>

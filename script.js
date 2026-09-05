@@ -149,7 +149,7 @@ function createCursor(gsap) {
       aura.classList.remove('is-active');
     });
   });
-  document.querySelectorAll('.magnetic, .nav a, .contact-links a').forEach((element) => {
+  document.querySelectorAll('.magnetic').forEach((element) => {
     element.addEventListener('pointermove', (event) => {
       const bounds = element.getBoundingClientRect();
       gsap.to(element, { x: (event.clientX - bounds.left - bounds.width / 2) * .13, y: (event.clientY - bounds.top - bounds.height / 2) * .13, duration: .35, ease: 'power3.out', overwrite: true });
@@ -190,7 +190,11 @@ function startGsap() {
     .fromTo('.hero-name', { xPercent: 5, scale: 1.035, clipPath: 'inset(0 0 100% 0)' }, { autoAlpha: 1, xPercent: 0, scale: 1, clipPath: 'inset(0 0 0% 0)', duration: 1.25 }, '-=.42')
     .fromTo('.hero-statement', { y: 34, filter: 'blur(5px)' }, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: .8 }, '-=.55')
     .to('.hero-baseline', { scaleX: 1, duration: .8 }, '-=.45')
-    .to(['.hero-side', '.hero-edition', '.scroll-cue'], { autoAlpha: 1, y: 0, duration: .55, stagger: .08 }, '-=.38');
+    .to(['.hero-side', '.hero-edition', '.scroll-cue'], { autoAlpha: 1, y: 0, duration: .55, stagger: .08 }, '-=.38')
+    .eventCallback('onComplete', () => {
+      themeRoot.dataset.introComplete = 'true';
+      window.dispatchEvent(new CustomEvent('portfolio:intro-complete'));
+    });
   gsap.utils.toArray('.reveal').forEach((element) => revealText(gsap, element));
   gsap.to('.about-copy h2', { yPercent: -8, ease: 'none', scrollTrigger: { trigger: '.about', start: 'top bottom', end: 'bottom top', scrub: .7 } });
   gsap.to('.signal-copy span:first-child', { xPercent: 8, ease: 'none', scrollTrigger: { trigger: '.signal', start: 'top bottom', end: 'bottom top', scrub: .8 } });
@@ -212,6 +216,7 @@ function startExperience() {
   if (reducedMotion) document.querySelectorAll('.reveal').forEach((element) => element.classList.add('visible'));
   else if (hasGsap) startGsap();
   else revealWithObserver();
+  window.PortfolioMicroMotion?.init({ ScrollTrigger: window.ScrollTrigger });
 }
 
 applyContactLinks();
