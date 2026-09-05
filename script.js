@@ -179,6 +179,25 @@ function revealText(gsap, element) {
   });
 }
 
+function createNavigationTransitions(gsap) {
+  const line = document.querySelector('.nav-transition-line');
+  if (!line || reducedMotion) return;
+
+  document.querySelectorAll('.nav nav a, .wordmark, .scroll-cue').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const target = document.querySelector(link.getAttribute('href'));
+      if (!target) return;
+
+      gsap.killTweensOf(line);
+      gsap.timeline()
+        .set(line, { scaleX: 0, opacity: 0, transformOrigin: 'left center' })
+        .to(line, { scaleX: 1, opacity: 1, duration: .24, ease: 'power4.in' })
+        .to(line, { scaleX: 0, opacity: 0, transformOrigin: 'right center', duration: .42, ease: 'power4.out' });
+    });
+  });
+}
+
 function startGsap() {
   const { gsap, ScrollTrigger } = window;
   gsap.registerPlugin(ScrollTrigger);
@@ -209,6 +228,7 @@ function startGsap() {
   });
   createMarquees(gsap);
   createCursor(gsap);
+  createNavigationTransitions(gsap);
   ScrollTrigger.refresh();
 }
 

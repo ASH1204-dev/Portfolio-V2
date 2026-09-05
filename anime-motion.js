@@ -25,6 +25,7 @@
       defaults: { duration: 260, ease: 'out(3)' },
       mediaQueries: {
         finePointer: '(hover: hover) and (pointer: fine)',
+        compactMotion: '(max-width: 700px)',
         reduceMotion: '(prefers-reduced-motion: reduce)'
       }
     }).add((self) => {
@@ -34,6 +35,7 @@
       const trackedTargets = new Set();
       const activeAnimations = new WeakMap();
       const entranceAnimations = new Set();
+      const compactMotion = self.matches.compactMotion;
 
       function listen(target, type, handler, options) {
         target.addEventListener(type, handler, options);
@@ -88,8 +90,14 @@
         const label = link.querySelector('.nav-label');
         const symbol = link.querySelector('.nav-symbol');
         const line = link.querySelector('.nav-micro-line');
+        const symbolText = symbol?.textContent.trim();
+        const symbolState = symbolText === '*'
+          ? { x: active ? 2 : 0, y: 0, rotate: active ? 16 : 0, scale: active ? 1.08 : 1 }
+          : symbolText === '//'
+            ? { x: active ? 5 : 0, y: 0, rotate: 0, scale: 1 }
+            : { x: active ? 4 : 0, y: active ? -2 : 0, rotate: active ? 5 : 0, scale: 1 };
         run(label, 'nav-label', { x: active ? 3 : 0, opacity: active ? .86 : 1, duration: active ? 220 : 340 });
-        run(symbol, 'nav-symbol', { x: active ? 4 : 0, y: active ? -1 : 0, rotate: active ? 5 : 0, duration: active ? 240 : 360 });
+        run(symbol, 'nav-symbol', { ...symbolState, duration: active ? 240 : 360 });
         animateAccentLine(line, active, 'nav-line');
       }
 
@@ -141,13 +149,15 @@
       }
 
       function animateProjectHover(row, active) {
-        const content = Array.from(row.children).filter((child) => !child.classList.contains('work-micro-line'));
+        const title = row.querySelector('[data-project-title]') || row.children[0];
+        const metadata = row.querySelector('[data-project-meta]') || row.children[1];
+        const marker = row.querySelector('[data-project-marker]') || row.children[2];
+        const image = row.querySelector('[data-project-image]');
         const line = row.querySelector('.work-micro-line');
-        content.forEach((item, index) => run(item, `project-${index}`, {
-          x: active ? Math.min(7, 2 + index * 2) : 0,
-          opacity: active ? .78 + index * .08 : 1,
-          duration: active ? 240 : 380
-        }));
+        run(title, 'project-title', { x: active ? 3 : 0, opacity: 1, duration: active ? 240 : 380 });
+        run(metadata, 'project-meta', { x: active ? 5 : 0, opacity: active ? .86 : 1, duration: active ? 260 : 380 });
+        run(marker, 'project-marker', { x: active ? 7 : 0, rotate: active ? -5 : 0, duration: active ? 260 : 400 });
+        if (image) run(image, 'project-image', { scale: active ? 1.025 : 1, duration: active ? 420 : 620, ease: 'out(4)' });
         animateAccentLine(line, active, 'project-line');
       }
 
@@ -179,6 +189,95 @@
           observer.observe(trigger);
           observers.push(observer);
         }
+      }
+
+      function setupTriggeredEffect(targets, trigger, prepare, reveal, viewportRatio = .86) {
+        if (!targets.length || !trigger) return;
+        const bounds = trigger.getBoundingClientRect();
+        if (bounds.bottom <= 0) return;
+
+        prepare();
+        if (bounds.top <= window.innerHeight * viewportRatio) {
+          requestAnimationFrame(reveal);
+        } else if (ScrollTrigger?.create) {
+          triggers.push(ScrollTrigger.create({ trigger, start: `top ${viewportRatio * 100}%`, once: true, onEnter: reveal }));
+        } else {
+          const observer = new IntersectionObserver((entries, currentObserver) => {
+            if (!entries.some((entry) => entry.isIntersecting)) return;
+            reveal();
+            currentObserver.disconnect();
+          }, { threshold: .12 });
+          observer.observe(trigger);
+          observers.push(observer);
+        }
+      }
+
+      function setupCreativeText() {
+        const aboutFocus = document.querySelector('.about-copy h2 span');
+        setupTriggeredEffect(
+          aboutFocus ? [aboutFocus] : [],
+          document.querySelector('.about'),
+          () => utils.set(aboutFocus, { opacity: 0, filter: `blur(${compactMotion ? 4 : 7}px)`, clipPath: 'inset(0 100% 0 0)' }),
+          () => runEntrance([aboutFocus], {
+            opacity: 1,
+            filter: 'blur(0px)',
+            clipPath: 'inset(0 0% 0 0)',
+            duration: compactMotion ? 480 : 640,
+            delay: compactMotion ? 110 : 220,
+            ease: 'out(4)'
+          })
+        );
+
+        document.querySelectorAll('.skill-title').forEach((title) => {
+          const words = Array.from(title.children);
+          setupTriggeredEffect(
+            words,
+            title.closest('.skills'),
+            () => utils.set(words, { y: compactMotion ? 8 : 14, opacity: 0, filter: `blur(${compactMotion ? 3 : 4}px)` }),
+            () => runEntrance(words, {
+              y: 0,
+              opacity: 1,
+              filter: 'blur(0px)',
+              duration: compactMotion ? 420 : 560,
+              delay: stagger(compactMotion ? 60 : 85, { start: compactMotion ? 140 : 260 }),
+              ease: 'out(4)'
+            })
+          );
+        });
+
+        const aiWords = Array.from(document.querySelectorAll('.ai-focus-line .ai-word'));
+        setupTriggeredEffect(
+          aiWords,
+          document.querySelector('.ai-callout'),
+          () => {
+            if (aiWords[0]) utils.set(aiWords[0], { x: compactMotion ? -9 : -18, y: compactMotion ? 6 : 12, rotate: compactMotion ? -.6 : -1.4, opacity: 0, filter: `blur(${compactMotion ? 4 : 7}px)` });
+            if (aiWords[1]) utils.set(aiWords[1], { x: compactMotion ? 9 : 18, y: compactMotion ? -4 : -8, rotate: compactMotion ? .5 : 1.2, opacity: 0, filter: `blur(${compactMotion ? 4 : 7}px)` });
+          },
+          () => runEntrance(aiWords, {
+            x: 0,
+            y: 0,
+            rotate: 0,
+            opacity: 1,
+            filter: 'blur(0px)',
+            duration: compactMotion ? 540 : 760,
+            delay: stagger(compactMotion ? 70 : 105),
+            ease: 'out(4)'
+          }),
+          .82
+        );
+      }
+
+      function setupSectionLines() {
+        document.querySelectorAll('.section-entry-line').forEach((line) => {
+          const section = line.closest('section');
+          setupTriggeredEffect(
+            [line],
+            section,
+            () => utils.set(line, { scaleX: 0, opacity: .08 }),
+            () => runEntrance([line], { scaleX: 1, opacity: .38, duration: compactMotion ? 560 : 760, ease: 'inOut(3)' }),
+            .9
+          );
+        });
       }
 
       function setupMetadataEntrances() {
@@ -216,6 +315,8 @@
       }
 
       setupMetadataEntrances();
+      setupCreativeText();
+      setupSectionLines();
 
       if (self.matches.finePointer) {
         document.querySelectorAll('.nav nav a').forEach((link) => bindHover(link, (active) => animateNavHover(link, active)));
@@ -236,10 +337,12 @@
         observers.splice(0).forEach((observer) => observer.disconnect());
         entranceAnimations.forEach((animation) => animation.cancel());
         trackedTargets.forEach((target) => activeAnimations.get(target)?.forEach((animation) => animation.cancel()));
-        document.querySelectorAll('.nav-label,.nav-symbol,.nav-micro-line,.hero-name-inner,.section-label>span,.education .meta,.trajectory-intro .meta,.work-top>.meta,.work-empty>.meta,.ai-callout>.meta,.callout-bottom>span,.contact-links>.meta,.footer-info>div,.interest h2,.interest-micro-line,.interest-marker,.contact-label,.contact-micro-line,.contact-links i,.work-line>span').forEach((element) => {
+        document.querySelectorAll('.nav-label,.nav-symbol,.nav-micro-line,.hero-name-inner,.section-label>span,.education .meta,.trajectory-intro .meta,.work-top>.meta,.work-empty>.meta,.ai-callout>.meta,.callout-bottom>span,.contact-links>.meta,.footer-info>div,.interest h2,.interest-micro-line,.interest-marker,.contact-label,.contact-micro-line,.contact-links i,.work-line>span,.about-copy h2 span,.skill-title>span,.ai-word,.section-entry-line').forEach((element) => {
           element.style.removeProperty('transform');
           element.style.removeProperty('opacity');
           element.style.removeProperty('letter-spacing');
+          element.style.removeProperty('filter');
+          element.style.removeProperty('clip-path');
         });
       };
     });
